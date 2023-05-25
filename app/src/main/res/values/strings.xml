@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">top_publication_app</string>
+    <string name="app_name">Reddit Top Publications</string>
     <string name="post_image">Image</string>
 </resources>

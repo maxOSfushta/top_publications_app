@@ -1,16 +1,19 @@
 package com.example.top_publication_app;
 
 public class RedditPost {
-    private String title;
-    private String author;
-    private int numComments;
-    private long createdUtc;
+    private final String title;
+    private final String author;
+    private final int numComments;
+    private final long createdUtc;
+    private final String thumbnailUrl;
 
-    public RedditPost(String title, String author, int numComments, long createdUtc) {
+
+    public RedditPost(String title, String author, int numComments, long createdUtc, String thumbnailUrl) {
         this.title = title;
         this.author = author;
         this.numComments = numComments;
         this.createdUtc = createdUtc;
+        this.thumbnailUrl = thumbnailUrl;
     }
 
     public String getTitle() {
@@ -27,5 +30,9 @@ public class RedditPost {
 
     public long getCreatedUtc() {
         return createdUtc;
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
     }
 }

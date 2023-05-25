@@ -1,37 +1,50 @@
 package com.example.top_publication_app;
 
-import android.content.Context;
-import android.content.Intent;
+import android.annotation.SuppressLint;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.List;
+public class RedditPostViewHolder extends RecyclerView.ViewHolder {
 
-public class RedditPostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-    private Context context;
-    private List<RedditPost> posts;
+    private TextView titleTextView;
+    private TextView authorTextView;
+    private TextView commentsTextView;
+    private TextView timeTextView;
 
-    public RedditPostViewHolder(@NonNull View itemView, Context context, List<RedditPost> posts) {
+    public RedditPostViewHolder(@NonNull View itemView) {
         super(itemView);
-        this.context = context;
-        this.posts = posts;
-        itemView.setOnClickListener(this);
+
+        titleTextView = itemView.findViewById(R.id.titleTextView);
+        authorTextView = itemView.findViewById(R.id.authorTextView);
+        commentsTextView = itemView.findViewById(R.id.commentsTextView);
+        timeTextView = itemView.findViewById(R.id.timeTextView);
     }
 
-    @Override
-    public void onClick(View v) {
-        int position = getAdapterPosition();
-        if (position != RecyclerView.NO_POSITION) {
-            RedditPost post = posts.get(position);
-            openDetailedInformation(post);
+    @SuppressLint("SetTextI18n")
+    public void bind(RedditPost post) {
+        titleTextView.setText(post.getTitle());
+        authorTextView.setText("Posted by " + post.getAuthor() + " • " + getFormattedTimeAgo(post.getCreatedUtc()));
+        commentsTextView.setText("Comments: " + post.getNumComments());
+    }
+
+    private String getFormattedTimeAgo(long createdUtc) {
+        long currentTime = System.currentTimeMillis() / 1000L;
+        long timeDifference = currentTime - createdUtc;
+
+        if (timeDifference < 60) {
+            return timeDifference + " seconds ago";
+        } else if (timeDifference < 3600) {
+            long minutes = timeDifference / 60;
+            return minutes + " minutes ago";
+        } else if (timeDifference < 86400) {
+            long hours = timeDifference / 3600;
+            return hours + " hours ago";
+        } else {
+            long days = timeDifference / 86400;
+            return days + " days ago";
         }
-    }
-
-    private void openDetailedInformation(RedditPost post) {
-        Intent intent = new Intent(context, MainActivity.class);
-        intent.putExtra("post", (CharSequence) post);
-        context.startActivity(intent);
     }
 }

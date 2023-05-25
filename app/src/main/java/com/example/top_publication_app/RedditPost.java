@@ -3,24 +3,14 @@ package com.example.top_publication_app;
 public class RedditPost {
     private String title;
     private String author;
-    private int score;
-    private int commentCount;
+    private int numComments;
     private long createdUtc;
-    private String thumbnail;
 
-    public RedditPost(String title, String author, int score) {
+    public RedditPost(String title, String author, int numComments, long createdUtc) {
         this.title = title;
         this.author = author;
-        this.score = score;
-    }
-
-    public RedditPost(String title, String author, int score, int commentCount, long createdUtc, String thumbnail) {
-        this.title = title;
-        this.author = author;
-        this.score = score;
-        this.commentCount = commentCount;
+        this.numComments = numComments;
         this.createdUtc = createdUtc;
-        this.thumbnail = thumbnail;
     }
 
     public String getTitle() {
@@ -31,23 +21,11 @@ public class RedditPost {
         return author;
     }
 
-    public int getScore() {
-        return score;
-    }
-
-    public int getCommentCount() {
-        return commentCount;
+    public int getNumComments() {
+        return numComments;
     }
 
     public long getCreatedUtc() {
         return createdUtc;
-    }
-
-    public String getThumbnail() {
-        return thumbnail;
-    }
-
-    public boolean hasThumbnail() {
-        return thumbnail != null && !thumbnail.isEmpty();
     }
 }

@@ -1,11 +1,8 @@
 package com.example.top_publication_app;
 
-import android.annotation.SuppressLint;
-import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,72 +11,89 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private RecyclerView recyclerView;
     private RedditPostsAdapter adapter;
-    private RedditApiHelper redditApiHelper;
-    private List<RedditPost> posts = new ArrayList<>();
 
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        recyclerView = findViewById(R.id.recyclerView);
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new RedditPostsAdapter();
         recyclerView.setAdapter(adapter);
 
-        redditApiHelper = new RedditApiHelper(this);
         fetchTopPosts();
     }
 
-    @SuppressLint("MissingInflatedId")
-    @Override
-    public void onConfigurationChanged(@NonNull Configuration configuration) {
-        super.onConfigurationChanged(configuration);
-
-        setContentView(R.layout.item_post_land);
-
-        recyclerView = findViewById(R.id.recyclerView);
-        adapter = new RedditPostsAdapter(this);
-        recyclerView.setAdapter(adapter);
-        adapter.setPosts(posts);
-    }
-
     private void fetchTopPosts() {
-        redditApiHelper.fetchTopPosts(response -> {
-            List<RedditPost> redditPosts = parseResponse(response);
-            posts = redditPosts;
-            adapter.setPosts(redditPosts);
-        }, error -> {
-            Toast.makeText(MainActivity.this, "Error while getting data", Toast.LENGTH_SHORT).show();
-        });
+        String url = "https://www.reddit.com/top.json?limit=100";
+        new FetchPostsTask().execute(url);
     }
 
-    private List<RedditPost> parseResponse(JSONObject response) {
-        List<RedditPost> redditPosts = new ArrayList<>();
+    private class FetchPostsTask extends AsyncTask<String, Void, String> {
 
-        try {
-            JSONObject data = response.getJSONObject("data");
-            JSONArray children = data.getJSONArray("children");
+        @Override
+        protected String doInBackground(String... urls) {
+            String url = urls[0];
+            String response = null;
 
-            for (int i = 0; i < children.length(); i++) {
-                JSONObject postObject = children.getJSONObject(i).getJSONObject("data");
-                String title = postObject.getString("title");
-                String author = postObject.getString("author");
-                int score = postObject.getInt("score");
+            try {
+                URL apiUrl = new URL(url);
+                HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
+                connection.setRequestMethod("GET");
 
-                RedditPost redditPost = new RedditPost(title, author, score);
-                redditPosts.add(redditPost);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder stringBuilder = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    stringBuilder.append(line).append("\n");
+                }
+                reader.close();
+
+                response = stringBuilder.toString();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
+
+            return response;
         }
-        return redditPosts;
+
+        @Override
+        protected void onPostExecute(String response) {
+            super.onPostExecute(response);
+
+            try {
+                JSONObject jsonObject = new JSONObject(response);
+                JSONObject data = jsonObject.getJSONObject("data");
+                JSONArray children = data.getJSONArray("children");
+
+                List<RedditPost> posts = new ArrayList<>();
+                for (int i = 0; i < children.length(); i++) {
+                    JSONObject postObject = children.getJSONObject(i).getJSONObject("data");
+
+                    String title = postObject.getString("title");
+                    String author = postObject.getString("author");
+                    int numComments = postObject.getInt("num_comments");
+                    long createdUtc = postObject.getLong("created_utc");
+
+                    RedditPost post = new RedditPost(title, author, numComments, createdUtc);
+                    posts.add(post);
+                }
+
+                adapter.setPosts(posts);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

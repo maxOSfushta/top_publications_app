@@ -6,6 +6,7 @@ public class RedditPost {
     private final int numComments;
     private final long createdUtc;
     private final String thumbnailUrl;
+    private String imageUrl;
 
 
     public RedditPost(String title, String author, int numComments, long createdUtc, String thumbnailUrl) {
@@ -34,5 +35,13 @@ public class RedditPost {
 
     public String getThumbnailUrl() {
         return thumbnailUrl;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

@@ -85,9 +85,11 @@ public class MainActivity extends AppCompatActivity {
                     String author = postObject.getString("author");
                     int numComments = postObject.getInt("num_comments");
                     long createdUtc = postObject.getLong("created_utc");
-                    String thumbnailUrl = postObject.optString("thumbnail");
+                    String thumbnailUrl = postObject.getString("thumbnail");
+                    String imageUrl = postObject.getString("url");
 
                     RedditPost post = new RedditPost(title, author, numComments, createdUtc, thumbnailUrl);
+                    post.setImageUrl(imageUrl);
                     posts.add(post);
                 }
 

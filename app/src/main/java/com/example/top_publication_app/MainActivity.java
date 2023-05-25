@@ -1,15 +1,14 @@
 package com.example.top_publication_app;
 
 import android.annotation.SuppressLint;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private RedditPostsAdapter adapter;
     private RedditApiHelper redditApiHelper;
+    private List<RedditPost> posts = new ArrayList<>();
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -38,17 +38,26 @@ public class MainActivity extends AppCompatActivity {
         fetchTopPosts();
     }
 
+    @SuppressLint("MissingInflatedId")
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration configuration) {
+        super.onConfigurationChanged(configuration);
+
+        setContentView(R.layout.item_post_land);
+
+        recyclerView = findViewById(R.id.recyclerView);
+        adapter = new RedditPostsAdapter(this);
+        recyclerView.setAdapter(adapter);
+        adapter.setPosts(posts);
+    }
+
     private void fetchTopPosts() {
-        redditApiHelper.fetchTopPosts(new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                // Обработка ответа от сервера
-                List<RedditPost> redditPosts = parseResponse(response);
-                adapter.setPosts(redditPosts);
-            }
+        redditApiHelper.fetchTopPosts(response -> {
+            List<RedditPost> redditPosts = parseResponse(response);
+            posts = redditPosts;
+            adapter.setPosts(redditPosts);
         }, error -> {
-            // Обработка ошибки запроса
-            Toast.makeText(MainActivity.this, "Ошибка при получении данных", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Error while getting data", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -71,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
         return redditPosts;
     }
 }

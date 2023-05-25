@@ -63,11 +63,11 @@ public class RedditPostsAdapter extends RecyclerView.Adapter<RedditPostsAdapter.
     }
 
     public class RedditPostViewHolder extends RecyclerView.ViewHolder {
-        private TextView titleTextView;
-        private TextView authorTextView;
-        private TextView scoreTextView;
-        private TextView commentsTextView;
-        private ImageView thumbnailImageView;
+        private final TextView titleTextView;
+        private final TextView authorTextView;
+        private final TextView scoreTextView;
+        private final TextView commentsTextView;
+        private final ImageView thumbnailImageView;
 
         public RedditPostViewHolder(@NonNull View itemView) {
             super(itemView);

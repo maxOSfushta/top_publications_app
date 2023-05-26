@@ -28,6 +28,10 @@ public class MainActivity extends AppCompatActivity {
     private boolean isLoading = false;
     private LinearLayoutManager layoutManager;
 
+    private static final String KEY_POSTS = "posts";
+    private static final String KEY_AFTER = "after";
+    private static final String KEY_IS_LOADING = "isLoading";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +60,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        fetchTopPosts();
+        if (savedInstanceState != null) {
+            allPosts = savedInstanceState.getParcelableArrayList(KEY_POSTS);
+            after = savedInstanceState.getString(KEY_AFTER);
+            isLoading = savedInstanceState.getBoolean(KEY_IS_LOADING);
+            adapter.setPosts(allPosts);
+        } else {
+            fetchTopPosts();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(KEY_POSTS, new ArrayList<>(allPosts));
+        outState.putString(KEY_AFTER, after);
+        outState.putBoolean(KEY_IS_LOADING, isLoading);
     }
 
     private void fetchTopPosts() {

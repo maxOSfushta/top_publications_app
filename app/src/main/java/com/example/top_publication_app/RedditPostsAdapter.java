@@ -1,5 +1,6 @@
 package com.example.top_publication_app;
 
+import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +15,7 @@ import java.util.List;
 
 public class RedditPostsAdapter extends RecyclerView.Adapter<RedditPostViewHolder> {
 
-    private final List<RedditPost> posts;
+    private List<RedditPost> posts;
 
     public RedditPostsAdapter(List<RedditPost> posts) {
         this.posts = posts;
@@ -56,5 +57,11 @@ public class RedditPostsAdapter extends RecyclerView.Adapter<RedditPostViewHolde
     @Override
     public int getItemCount() {
         return posts.size();
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void setPosts(List<RedditPost> posts) {
+        this.posts = posts;
+        notifyDataSetChanged();
     }
 }

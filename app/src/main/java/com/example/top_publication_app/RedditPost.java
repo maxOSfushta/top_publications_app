@@ -1,6 +1,11 @@
 package com.example.top_publication_app;
 
-public class RedditPost {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+
+public class RedditPost implements Parcelable {
 
     private final String title;
     private final String author;
@@ -16,6 +21,26 @@ public class RedditPost {
         this.createdUtc = createdUtc;
         this.thumbnailUrl = thumbnailUrl;
     }
+
+    protected RedditPost(Parcel in) {
+        title = in.readString();
+        author = in.readString();
+        numComments = in.readInt();
+        createdUtc = in.readLong();
+        thumbnailUrl = in.readString();
+    }
+
+    public static final Creator<RedditPost> CREATOR = new Creator<RedditPost>() {
+        @Override
+        public RedditPost createFromParcel(Parcel in) {
+            return new RedditPost(in);
+        }
+
+        @Override
+        public RedditPost[] newArray(int size) {
+            return new RedditPost[size];
+        }
+    };
 
     public String getTitle() {
         return title;
@@ -41,5 +66,19 @@ public class RedditPost {
     }
 
     public void setId(String id) {
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
+        dest.writeString(title);
+        dest.writeString(author);
+        dest.writeInt(numComments);
+        dest.writeLong(createdUtc);
+        dest.writeString(thumbnailUrl);
     }
 }

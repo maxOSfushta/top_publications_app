@@ -1,12 +1,12 @@
 package com.example.top_publication_app;
 
 public class RedditPost {
+
     private final String title;
     private final String author;
     private final int numComments;
     private final long createdUtc;
     private final String thumbnailUrl;
-    private String imageUrl;
 
 
     public RedditPost(String title, String author, int numComments, long createdUtc, String thumbnailUrl) {
@@ -37,11 +37,9 @@ public class RedditPost {
         return thumbnailUrl;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public void setImageUrl(String imageUrl) {
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setId(String id) {
     }
 }

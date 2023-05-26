@@ -1,6 +1,5 @@
 package com.example.top_publication_app;
 
-import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,17 +10,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RedditPostsAdapter extends RecyclerView.Adapter<RedditPostViewHolder> {
 
-    private List<RedditPost> posts = new ArrayList<>();
+    private final List<RedditPost> posts;
 
-    @SuppressLint("NotifyDataSetChanged")
-    public void setPosts(List<RedditPost> posts) {
+    public RedditPostsAdapter(List<RedditPost> posts) {
         this.posts = posts;
-        notifyDataSetChanged();
     }
 
     @NonNull

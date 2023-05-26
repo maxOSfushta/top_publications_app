@@ -14,10 +14,9 @@ import com.squareup.picasso.Picasso;
 
 public class RedditPostViewHolder extends RecyclerView.ViewHolder {
 
-    private TextView titleTextView;
-    private TextView authorTextView;
-    private TextView commentsTextView;
-    private TextView timeTextView;
+    private final TextView titleTextView;
+    private final TextView authorTextView;
+    private final TextView commentsTextView;
     ImageView thumbnailImageView;
 
     public RedditPostViewHolder(@NonNull View itemView) {
@@ -26,7 +25,6 @@ public class RedditPostViewHolder extends RecyclerView.ViewHolder {
         titleTextView = itemView.findViewById(R.id.titleTextView);
         authorTextView = itemView.findViewById(R.id.authorTextView);
         commentsTextView = itemView.findViewById(R.id.commentsTextView);
-        timeTextView = itemView.findViewById(R.id.timeTextView);
         thumbnailImageView = itemView.findViewById(R.id.thumbnailImageView);
 
         thumbnailImageView.setOnClickListener(v -> {

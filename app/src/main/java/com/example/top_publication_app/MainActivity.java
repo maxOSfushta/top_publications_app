@@ -1,8 +1,10 @@
 package com.example.top_publication_app;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +23,10 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private RedditPostsAdapter adapter;
+    private List<RedditPost> allPosts;
+    private String after;
+    private boolean isLoading = false;
+    private LinearLayoutManager layoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,24 +34,49 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new RedditPostsAdapter();
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+
+        allPosts = new ArrayList<>();
+        adapter = new RedditPostsAdapter(allPosts);
         recyclerView.setAdapter(adapter);
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                int visibleItemCount = layoutManager.getChildCount();
+                int totalItemCount = layoutManager.getItemCount();
+                int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+
+                if (!isLoading && (visibleItemCount + firstVisibleItemPosition) >= totalItemCount) {
+                    loadMorePosts();
+                }
+            }
+        });
 
         fetchTopPosts();
     }
 
     private void fetchTopPosts() {
-        String url = "https://www.reddit.com/top.json?limit=100";
+        String url = "https://www.reddit.com/top.json";
         new FetchPostsTask().execute(url);
     }
 
-    private class FetchPostsTask extends AsyncTask<String, Void, String> {
+    private void loadMorePosts() {
+        isLoading = true;
+        String url = "https://www.reddit.com/top.json?after=" + after;
+        new FetchPostsTask().execute(url);
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private class FetchPostsTask extends AsyncTask<String, Void, List<RedditPost>> {
 
         @Override
-        protected String doInBackground(String... urls) {
+        protected List<RedditPost> doInBackground(String... urls) {
             String url = urls[0];
-            String response = null;
+            List<RedditPost> posts = new ArrayList<>();
 
             try {
                 URL apiUrl = new URL(url);
@@ -60,24 +91,14 @@ public class MainActivity extends AppCompatActivity {
                 }
                 reader.close();
 
-                response = stringBuilder.toString();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                String response = stringBuilder.toString();
 
-            return response;
-        }
-
-        @Override
-        protected void onPostExecute(String response) {
-            super.onPostExecute(response);
-
-            try {
                 JSONObject jsonObject = new JSONObject(response);
                 JSONObject data = jsonObject.getJSONObject("data");
                 JSONArray children = data.getJSONArray("children");
 
-                List<RedditPost> posts = new ArrayList<>();
+                after = data.getString("after");
+
                 for (int i = 0; i < children.length(); i++) {
                     JSONObject postObject = children.getJSONObject(i).getJSONObject("data");
 
@@ -87,16 +108,29 @@ public class MainActivity extends AppCompatActivity {
                     long createdUtc = postObject.getLong("created_utc");
                     String thumbnailUrl = postObject.getString("thumbnail");
                     String imageUrl = postObject.getString("url");
+                    String postId = postObject.getString("id");
 
                     RedditPost post = new RedditPost(title, author, numComments, createdUtc, thumbnailUrl);
                     post.setImageUrl(imageUrl);
+                    post.setId(postId);
                     posts.add(post);
                 }
 
-                adapter.setPosts(posts);
-            } catch (JSONException e) {
+            } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
+
+            return posts;
+        }
+
+        @SuppressLint("NotifyDataSetChanged")
+        @Override
+        protected void onPostExecute(List<RedditPost> posts) {
+            super.onPostExecute(posts);
+
+            allPosts.addAll(posts);
+            adapter.notifyDataSetChanged();
+            isLoading = false;
         }
     }
 }

@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.List;
+
 public class RedditPostViewHolder extends RecyclerView.ViewHolder {
 
     private final TextView titleTextView;
@@ -19,18 +21,19 @@ public class RedditPostViewHolder extends RecyclerView.ViewHolder {
     private final TextView commentsTextView;
     ImageView thumbnailImageView;
 
-    public RedditPostViewHolder(@NonNull View itemView) {
+    public RedditPostViewHolder(@NonNull View itemView, List<RedditPost> posts) {
         super(itemView);
-
+        thumbnailImageView = itemView.findViewById(R.id.thumbnailImageView);
         titleTextView = itemView.findViewById(R.id.titleTextView);
         authorTextView = itemView.findViewById(R.id.authorTextView);
         commentsTextView = itemView.findViewById(R.id.commentsTextView);
-        thumbnailImageView = itemView.findViewById(R.id.thumbnailImageView);
 
         thumbnailImageView.setOnClickListener(v -> {
-            RedditPost post = (RedditPost) itemView.getTag();
-            if (post != null && post.getThumbnailUrl() != null && !post.getThumbnailUrl().isEmpty()) {
-                openImageInBrowser(post.getThumbnailUrl());
+            int position = getAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+                RedditPost post = posts.get(position);
+                String originalUrl = post.getImageUrl();
+                openOriginalUrl(originalUrl);
             }
         });
     }
@@ -52,6 +55,11 @@ public class RedditPostViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
+    private void openOriginalUrl(String originalUrl) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(originalUrl));
+        itemView.getContext().startActivity(intent);
+    }
+
     private String getFormattedTimeAgo(long createdUtc) {
         long currentTime = System.currentTimeMillis() / 1000L;
         long timeDifference = currentTime - createdUtc;
@@ -68,13 +76,5 @@ public class RedditPostViewHolder extends RecyclerView.ViewHolder {
             long days = timeDifference / 86400;
             return days + " days ago";
         }
-    }
-
-    private void openImageInBrowser(String imageUrl) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.parse(imageUrl), "image/*");
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        itemView.getContext().startActivity(intent);
     }
 }

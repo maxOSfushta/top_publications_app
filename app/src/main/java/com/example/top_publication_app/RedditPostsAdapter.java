@@ -32,7 +32,7 @@ public class RedditPostsAdapter extends RecyclerView.Adapter<RedditPostViewHolde
             layoutRes = R.layout.item_post_port;
         }
         View view = LayoutInflater.from(parent.getContext()).inflate(layoutRes, parent, false);
-        return new RedditPostViewHolder(view);
+        return new RedditPostViewHolder(view, posts);
     }
 
     @Override

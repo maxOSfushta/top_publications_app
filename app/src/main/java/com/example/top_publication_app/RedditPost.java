@@ -12,14 +12,16 @@ public class RedditPost implements Parcelable {
     private final int numComments;
     private final long createdUtc;
     private final String thumbnailUrl;
+    private final String imageUrl;
 
 
-    public RedditPost(String title, String author, int numComments, long createdUtc, String thumbnailUrl) {
+    public RedditPost(String title, String author, int numComments, long createdUtc, String thumbnailUrl, String imageUrl) {
         this.title = title;
         this.author = author;
         this.numComments = numComments;
         this.createdUtc = createdUtc;
         this.thumbnailUrl = thumbnailUrl;
+        this.imageUrl = imageUrl;
     }
 
     protected RedditPost(Parcel in) {
@@ -28,6 +30,7 @@ public class RedditPost implements Parcelable {
         numComments = in.readInt();
         createdUtc = in.readLong();
         thumbnailUrl = in.readString();
+        imageUrl = in.readString();
     }
 
     public static final Creator<RedditPost> CREATOR = new Creator<RedditPost>() {
@@ -65,6 +68,10 @@ public class RedditPost implements Parcelable {
     public void setImageUrl(String imageUrl) {
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
     public void setId(String id) {
     }
 
@@ -80,5 +87,6 @@ public class RedditPost implements Parcelable {
         dest.writeInt(numComments);
         dest.writeLong(createdUtc);
         dest.writeString(thumbnailUrl);
+        dest.writeString(imageUrl);
     }
 }

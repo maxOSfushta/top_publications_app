@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                     String imageUrl = postObject.getString("url");
                     String postId = postObject.getString("id");
 
-                    RedditPost post = new RedditPost(title, author, numComments, createdUtc, thumbnailUrl);
+                    RedditPost post = new RedditPost(title, author, numComments, createdUtc, thumbnailUrl, imageUrl);
                     post.setImageUrl(imageUrl);
                     post.setId(postId);
                     posts.add(post);

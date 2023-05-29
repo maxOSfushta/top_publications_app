@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Reddit Top Publications</title>
 </head>
 <body>
   <h1>Reddit Top Publications</h1>
